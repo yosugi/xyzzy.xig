@@ -2,23 +2,34 @@
 ; xyzzy interface for git
 ; written by yosugi
 
-(provide "xig")
+(provide "xig/xig")
 (in-package "editor")
 
 (export '(xig-mode *xig-git-path*))
 
-;(defvar *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe" "git のパス")
-(defvar *xig-git-path* "git" "git のパス")
+(defvar *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe" "git のパス")
 (defvar *xig-git-shortlog-command* "log --pretty=format:\"%h %ci %an %d %s\"" "shortlog を表示する時のコマンド")
 
-(defun run-git (command)
+(defvar *xig-main-map* nil)
+(unless *xig-main-map*
+  (setq *xig-main-map* (make-sparse-keymap))
+  (define-key *xig-main-map* '#\h 'backward-char)
+  (define-key *xig-main-map* '#\j 'next-line)
+  (define-key *xig-main-map* '#\k 'previous-line)
+  (define-key *xig-main-map* '#\l 'forward-char)
+  (define-key *xig-main-map* '#\0 #'(lambda () (interactive) (goto-bol)))
+  (define-key *xig-main-map* '#\$ #'(lambda () (interactive) (goto-eol)))
+  (define-key *xig-main-map* '#\g #'(lambda () (interactive) (goto-char (point-min))))
+  (define-key *xig-main-map* '#\G #'(lambda () (interactive) (goto-char (point-max)) (goto-bol)))
+  (define-key *xig-main-map* '#\RET 'show-diff)
+)
+
+(defun run-git (command &optional (buffer (selected-buffer)))
   "git 起動用"
-  (with-output-to-temp-buffer ("*result*") t
-    (execute-shell-command
-     (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
-     nil
-     (selected-buffer)))
-  )
+  (execute-shell-command
+   (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
+   nil
+   buffer))
 
 (defun git-version ()
   (interactive)
@@ -35,8 +46,12 @@
 ; ref. https://www.kernel.org/pub/software/scm/git/docs/git-log.html
 
 (defun git-shortlog ()
-  (interactive)
   (run-git *xig-git-shortlog-command*))
+
+(defun show-diff ()
+  (interactive)
+  ; TODO diff を見せる
+  )
 
 ; git log --stat -p
 ; git log --stat -p --pretty=full
@@ -92,3 +107,14 @@
 
 ; 文字列は sring-match で取れる
 ; http://www.geocities.jp/m_hiroi/xyzzy_lisp/abclisp16.html
+
+(defun xig-mode ()
+  (interactive)
+  (with-output-to-temp-buffer ("*xig-main*" nil)
+    (git-shortlog)
+    (setq buffer-read-only t)
+    (setq mode-name "xig-main")
+    (setq buffer-mode 'xig-mode)
+    (toggle-cursor-line t)
+    (use-keymap *xig-main-map*)))
+  
