@@ -24,7 +24,7 @@
       (goto-eol)
       (setq to (point))
       (setq line (buffer-substring from to)))
-    (if (null (string-match "[0-9a-f]\\{7\\}" line))
+    (if (null (string-match "[0-9a-f]+" line))
         (return-from show-diff))
     (setq commit (match-string 0))
     (pop-to-buffer (get-buffer-create "*xig-diff*")
