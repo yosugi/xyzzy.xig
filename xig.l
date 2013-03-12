@@ -68,10 +68,11 @@
 
 (defun quit-xig-mode ()
   (interactive)
+  (when (find-buffer "*xig-diff*")
+    (xig-quit-diff)
+    (return-from quit-xig-mode))
   (delete-pseudo-frame)
 ;  (delete-other-windows)
-  (and (find-buffer "*xig-diff*")
-       (delete-buffer (find-buffer "*xig-diff*")))
   (and (find-buffer "*xig-main*")
        (delete-buffer (find-buffer "*xig-main*")))
   )
