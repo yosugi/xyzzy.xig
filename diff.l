@@ -6,6 +6,10 @@
 (require "xig/common")
 (require "xig/xig")
 
+(export '(*xig-diff-window-ratio*))
+
+(defvar *xig-diff-window-ratio* 0.75 "diff ‚ðŠJ‚­”ä—¦")
+
 (defvar *xig-diff-map* nil)
 (unless *xig-diff-map*
   (setq *xig-diff-map* (copy-keymap *xig-common-map*))
@@ -24,11 +28,11 @@
       (goto-eol)
       (setq to (point))
       (setq line (buffer-substring from to)))
-    (if (null (string-match "[0-9a-f]+" line))
+    (or (string-match "[0-9a-f]+" line)
         (return-from show-diff))
     (setq commit (match-string 0))
     (pop-to-buffer (get-buffer-create "*xig-diff*")
-                   (truncate (* (screen-height) 0.75 -1)) ; -1 ‚Í‰º‚É•ªŠ„‚³‚¹‚é‚½‚ß
+                   (truncate (* (screen-height) *xig-diff-window-ratio* -1)) ; -1 ‚Í‰º‚É•ªŠ„‚³‚¹‚é‚½‚ß
                    nil)
     (kill-all-local-variables)
     (setq buffer-read-only nil)

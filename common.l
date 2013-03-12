@@ -4,6 +4,9 @@
 
 (provide "xig/common")
 
+(defvar *xig-mode-name* "xig" "このモードの名前")
+(defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
+
 (defvar *xig-common-map* nil)
 (unless *xig-common-map*
   (setq *xig-common-map* (make-sparse-keymap))

@@ -24,7 +24,7 @@
 (defvar *xig-main-map* nil)
 (unless *xig-main-map*
   (setq *xig-main-map* (copy-keymap *xig-common-map*))
-  (define-key *xig-main-map* '#\r 'show-shortlog)
+  (define-key *xig-main-map* '#\R 'show-shortlog)
   (define-key *xig-main-map* '#\g 'toggle-shortlog)
   (define-key *xig-main-map* '#\RET 'show-diff)
   (define-key *xig-main-map* '#\q 'quit-xig-mode)
@@ -55,6 +55,7 @@
 
 (defun xig-mode ()
   (interactive)
+  (new-pseudo-frame *xig-pframe-name*)
   (switch-to-buffer "*xig-main*")
   (kill-all-local-variables)
   (show-shortlog)
@@ -67,6 +68,10 @@
 
 (defun quit-xig-mode ()
   (interactive)
+  (delete-pseudo-frame)
+;  (delete-other-windows)
+  (and (find-buffer "*xig-diff*")
+       (delete-buffer (find-buffer "*xig-diff*")))
   (and (find-buffer "*xig-main*")
        (delete-buffer (find-buffer "*xig-main*")))
   )
