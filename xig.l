@@ -11,6 +11,8 @@
 ; (setq *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe")
 
 (provide "xig/xig")
+(in-package "editor")
+
 (require "xig/common")
 (require "xig/diff")
 

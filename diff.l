@@ -3,6 +3,8 @@
 ; written by yosugi
 
 (provide "xig/diff")
+(in-package "editor")
+
 (require "xig/common")
 (require "xig/xig")
 

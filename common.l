@@ -3,6 +3,7 @@
 ; written by yosugi
 
 (provide "xig/common")
+(in-package "editor")
 
 (defvar *xig-mode-name* "xig" "このモードの名前")
 (defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
