@@ -10,7 +10,7 @@
 
 (export '(*xig-diff-window-ratio*))
 
-(defvar *xig-diff-window-ratio* 0.75 "diff ‚ðŠJ‚­”ä—¦")
+(defvar *xig-diff-window-ratio* 0.70 "diff ‚ðŠJ‚­”ä—¦")
 
 (defvar *xig-diff-map* nil)
 (unless *xig-diff-map*
