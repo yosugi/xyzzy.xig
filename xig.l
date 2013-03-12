@@ -2,36 +2,41 @@
 ; xyzzy interface for git
 ; written by yosugi
 
+;; TODO モード毎にファイル分ける
+;; TODO *xig-mail* が開いたファイルのバッファに書き込まれている
+;; TODO *xig-diff* 選択されるたびにバッファをクリア
+;; TODO キーバインド / で検索
+;; TODO main 画面 g でグラフのありなし
+;; TODO main 画面に q を作る
+;; TODO diff スペースでスクロール
+;; 今の状態でファイル分けたら公開するか
+;; 最初の設定も外出しにしよう
+;; * xig, xig/common, xig/diff
+;
+; .xyzzy の設定
+; (load-library "xig/xig")
+; (setq *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe")
+
 (provide "xig/xig")
-(in-package "editor")
+(require "xig/common")
+(require "xig/diff")
 
 (export '(xig-mode *xig-git-path*))
 
-(defvar *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe" "git のパス")
+(defvar *xig-git-path* "git" "git のパス")
+(defvar *xig-shortlog-is-graph* nil "shortlog をグラフで表示しているか")
 (defvar *xig-git-shortlog-command* "log --pretty=format:\"%h %ci %an %d %s\"" "shortlog を表示する時のコマンド")
+(defvar *xig-git-shortlog-graph-command* (concat *xig-git-shortlog-command* " " "--graph"))
 
 (defvar *xig-main-map* nil)
 (unless *xig-main-map*
-  (setq *xig-main-map* (make-sparse-keymap))
-  (define-key *xig-main-map* '#\h 'backward-char)
-  (define-key *xig-main-map* '#\j 'next-line)
-  (define-key *xig-main-map* '#\k 'previous-line)
-  (define-key *xig-main-map* '#\l 'forward-char)
-  (define-key *xig-main-map* '#\0 #'(lambda () (interactive) (goto-bol)))
-  (define-key *xig-main-map* '#\$ #'(lambda () (interactive) (goto-eol)))
-  (define-key *xig-main-map* '#\g #'(lambda () (interactive) (goto-char (point-min))))
-  (define-key *xig-main-map* '#\G #'(lambda () (interactive) (goto-char (point-max)) (goto-bol)))
+  (setq *xig-main-map* (copy-keymap *xig-common-map*))
+  (define-key *xig-main-map* '#\r 'show-shortlog)
+  (define-key *xig-main-map* '#\g 'toggle-shortlog)
   (define-key *xig-main-map* '#\RET 'show-diff)
-)
+  )
 
-(defun run-git (command &optional (buffer (selected-buffer)))
-  "git 起動用"
-  (execute-shell-command
-   (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
-   nil
-   buffer))
-
-(defun git-version ()
+(defun show-version ()
   (interactive)
   (run-git "--version"))
 
@@ -42,23 +47,28 @@
 ;git log --pretty=format:"%ci %an %s"
 ;git log --pretty=format:"%ci %an %d %s" --graph
 ;git log --pretty=format:"%h %d %s" --graph
+;git log --pretty=format:"%h %ci %an %d %s" --graph
 ; ref. http://blog.toshimaru.net/git-log-graph
 ; ref. https://www.kernel.org/pub/software/scm/git/docs/git-log.html
 
-(defun git-shortlog ()
-  (run-git *xig-git-shortlog-command*))
-
-(defun show-diff ()
+(defun show-shortlog ()
   (interactive)
-  ; TODO diff を見せる
+  (setq buffer-read-only nil)
+  (run-git *xig-git-shortlog-command*)
+  (setq buffer-read-only t)
   )
 
-; git log --stat -p
-; git log --stat -p --pretty=full
-; git log --stat -p --pretty=fuller
-; ↑でほぼ OK だが Refs だけ表示されない。まぁいいか。
-(defun git-commit-info (commit)
-  (run-git (format nil "log --stat -p --pretty=fuller ~A" commit)))
+(defun toggle-shortlog ()
+  (interactive)
+  (setq buffer-read-only nil)
+  (cond
+   ((null *xig-shortlog-is-graph*)
+    (run-git *xig-git-shortlog-graph-command*)
+    (setq *xig-shortlog-is-graph* t))
+   (t
+    (run-git *xig-git-shortlog-command*)
+    (setq *xig-shortlog-is-graph* nil)))
+  (setq buffer-read-only t))
 
 ;(reduce (lambda (a b) (concat a " " b))
 ;        '("aa" "bb" "cc" "dd"))
@@ -90,7 +100,7 @@
 ;  (compile-regexp-keyword-list
 ;   '(("^!+.*$" t (:keyword 3 :bold :line) nil 0 0) ; 見出し
 ;     ("^>+\\(.*\\)$" t (:color 5) nil 1 1) ; 引用
-;	 ("^\\*+" t (:color 3 9 :bold) nil 0 0) ; 箇条書き
+;   ("^\\*+" t (:color 3 9 :bold) nil 0 0) ; 箇条書き
 ;	 ("^#+" t (:color 3 9 :bold) nil 0 0) ; 数字箇条書き
 ;	 ("^----$" t (:color 0 10 :line) nil 0 0) ; 水平線
 ;	 ("\\[\\(img\\)?\\[.*?\\]\\]" t (:keyword 2) nil 0 0) ; Wikiリンク/イメージ
@@ -110,11 +120,18 @@
 
 (defun xig-mode ()
   (interactive)
+  (kill-all-local-variables)
   (with-output-to-temp-buffer ("*xig-main*" nil)
-    (git-shortlog)
+    (switch-to-buffer "*xig-main*")
+    (show-shortlog)
     (setq buffer-read-only t)
     (setq mode-name "xig-main")
     (setq buffer-mode 'xig-mode)
-    (toggle-cursor-line t)
-    (use-keymap *xig-main-map*)))
-  
+    (setq aut-save nil)
+    (setq need-not-save nil)
+    ; TODO *window-flag-cursor-line* でカーソルの状態を保存。終了時に元に戻しとく
+    ;    (toggle-cursor-line t)
+    ;    (toggle-eof nil)
+    (use-keymap *xig-main-map*))
+  )
+
