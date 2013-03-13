@@ -15,6 +15,7 @@
 
 (require "xig/common")
 (require "xig/diff")
+(require "xig/status")
 
 (export '(xig-mode *xig-git-path*))
 
@@ -29,6 +30,7 @@
   (define-key *xig-main-map* '#\R 'show-shortlog)
   (define-key *xig-main-map* '#\g 'toggle-shortlog)
   (define-key *xig-main-map* '#\RET 'show-diff)
+  (define-key *xig-main-map* '#\S 'show-status)
   (define-key *xig-main-map* '#\q 'quit-xig-mode)
   )
 
