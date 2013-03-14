@@ -6,6 +6,7 @@
 (in-package "editor")
 
 (require "xig/common")
+(require "xig/commit")
 
 (defvar *xig-status-branch-message* "On branch")
 (defvar *xig-status-staged-message* "Changes to be committed:")
@@ -18,6 +19,7 @@
   (setq *xig-status-map* (copy-keymap *xig-common-map*))
   (define-key *xig-status-map* '#\u 'toggle-stage-file)
   (define-key *xig-status-map* '#\! 'xig-revert-file)
+  (define-key *xig-status-map* '#\C 'xig-edit-commit-message)
   (define-key *xig-status-map* '#\q 'xig-quit-status)
   )
 
@@ -153,7 +155,7 @@
 
     ;; 1. ファイル名取得
     (setq file (substring line 4))
-    (message file)
+    
     ;; 2. ステータス取得
     ;; 2.1 現在のポイントがどこか調査 (point)
     (let (begin-staged-point begin-unstaged-point begin-untracked-point)
@@ -171,15 +173,15 @@
       (cond
        ((between (point) begin-staged-point begin-unstaged-point)
         (setq buffer-read-only nil)
-        (run-git (format nil "reset HEAD ~A" file))
+        (call-git (format nil "reset HEAD ~A" file))
         (show-status)
         (scan-buffer file)
         )
        ((between (point) begin-unstaged-point (point-max))
         (setq buffer-read-only nil)
         (if (eq (char line 0) #\D)
-            (run-git (format nil "rm ~A" file))
-          (run-git (format nil "add ~A" file)))
+            (call-git (format nil "rm ~A" file))
+          (call-git (format nil "add ~A" file)))
         (show-status)
         (scan-buffer file)
         )
@@ -194,3 +196,4 @@
   (and (find-buffer "*xig-status*")
        (delete-buffer (find-buffer "*xig-status*")))
   )
+
