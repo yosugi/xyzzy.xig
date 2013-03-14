@@ -42,7 +42,6 @@
     (setq buffer-read-only t)
     (setq mode-name "xig-diff")
     (use-keymap *xig-diff-map*)
-    (other-window)
     )
   )
 

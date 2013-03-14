@@ -2,14 +2,6 @@
 ; xyzzy interface for git
 ; written by yosugi
 
-;; 今の状態でファイル分けたら公開するか
-;; 最初の設定も外出しにしよう
-;; * xig, xig/common, xig/diff
-;
-; .xyzzy の設定
-; (load-library "xig/xig")
-; (setq *xig-git-path* "C:/Program Files (x86)/Git/bin/git.exe")
-
 (provide "xig/xig")
 (in-package "editor")
 
@@ -18,6 +10,9 @@
 (require "xig/status")
 
 (export '(xig-mode *xig-git-path*))
+
+(defvar *xig-mode-name* "xig" "このモードの名前")
+(defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
 
 (defvar *xig-git-path* "git" "git のパス")
 (defvar *xig-shortlog-is-graph* nil "shortlog をグラフで表示しているか")
@@ -28,7 +23,7 @@
 (unless *xig-main-map*
   (setq *xig-main-map* (copy-keymap *xig-common-map*))
   (define-key *xig-main-map* '#\R 'show-shortlog)
-  (define-key *xig-main-map* '#\g 'toggle-shortlog)
+  (define-key *xig-main-map* '#\g 'toggle-shortlog-graph)
   (define-key *xig-main-map* '#\RET 'show-diff)
   (define-key *xig-main-map* '#\S 'show-status)
   (define-key *xig-main-map* '#\q 'quit-xig-mode)
@@ -42,10 +37,14 @@
   (interactive)
   (setq buffer-read-only nil)
   (run-git *xig-git-shortlog-command*)
+  (save-excursion
+    (goto-char (point-max))
+    (with-output-to-selected-buffer
+      (format t "~%")))
   (setq buffer-read-only t)
   )
 
-(defun toggle-shortlog ()
+(defun toggle-shortlog-graph ()
   (interactive)
   (setq buffer-read-only nil)
   (cond

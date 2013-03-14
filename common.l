@@ -5,8 +5,8 @@
 (provide "xig/common")
 (in-package "editor")
 
-(defvar *xig-mode-name* "xig" "縺薙�ｮ繝｢繝ｼ繝峨�ｮ蜷榊燕")
-(defvar *xig-pframe-name* *xig-mode-name* "繝輔Ξ繝ｼ繝縺ｮ蜷榊燕")
+(defvar *xig-mode-name* "xig" "このモードの名前")
+(defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
 
 (defvar *xig-common-map* nil)
 (unless *xig-common-map*
@@ -20,6 +20,7 @@
   (define-key *xig-common-map* '#\g #'(lambda () (interactive) (goto-char (point-min))))
   (define-key *xig-common-map* '#\G #'(lambda () (interactive) (goto-char (point-max)) (goto-bol)))
   (define-key *xig-common-map* '#\TAB 'other-window)
+  (define-key *xig-common-map* '#\SPC 'next-page)
   )
 
 (defun run-git (command &optional (buffer (selected-buffer)))
@@ -31,6 +32,7 @@
 (defun call-git (command)
   (call-process
    (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
-   :wait t :show :hide)
+   :wait t 
+   :show :hide)
    )
 
