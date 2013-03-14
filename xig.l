@@ -15,7 +15,7 @@
 (defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
 
 (defvar *xig-git-path* "git" "git のパス")
-(defvar *xig-shortlog-has-graph* nil "shortlog をグラフで表示しているか")
+(defvar *xig-shortlog-has-graph* nil "shortlog にグラフを表示しているか")
 (defvar *xig-git-shortlog-command* "log --pretty=format:\"%h %ci %an %d %s\"" "shortlog を表示する時のコマンド")
 (defvar *xig-git-shortlog-graph-command* (concat *xig-git-shortlog-command* " " "--graph"))
 
@@ -29,20 +29,14 @@
   (define-key *xig-main-map* '#\q 'xig-quit-mode)
   )
 
-(defun show-version ()
+(defun xig-show-version ()
   (interactive)
   (run-git "--version"))
 
 (defun xig-show-shortlog ()
   (interactive)
-  (setq buffer-read-only nil)
-  (run-git *xig-git-shortlog-command*)
-  (save-excursion
-    (goto-char (point-max))
-    (with-output-to-selected-buffer
-      (format t "~%")))
-  (setq buffer-read-only t)
-  )
+  (setq *xig-shortlog-has-graph* t)
+  (xig-toggle-shortlog-graph))
 
 (defun xig-toggle-shortlog-graph ()
   (interactive)
@@ -54,11 +48,9 @@
    (t
     (run-git *xig-git-shortlog-command*)
     (setq *xig-shortlog-has-graph* nil)))
-    (save-excursion
+  (save-excursion
     (goto-char (point-max))
-    (with-output-to-selected-buffer
-      (format t "~%")))
-  )
+    (with-output-to-selected-buffer (format t "~%"))))
 
 (defun xig-mode ()
   (interactive)
@@ -70,7 +62,7 @@
   (setup-temp-buffer (selected-buffer))
   (set-buffer-modified-p nil)
   (setq auto-save nil)
-  (setq need-not-save nil)
+  (setq need-not-save t)
   (setq mode-name "xig-main")
   (setq buffer-mode 'xig-mode)
   (use-keymap *xig-main-map*)

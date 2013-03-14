@@ -32,7 +32,6 @@
 (defun call-git (command)
   (call-process
    (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
-   :wait t 
-   :show :hide)
-   )
+   :wait t
+   :show :hide))
 

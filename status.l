@@ -24,16 +24,14 @@
   )
 
 (defun show-status-info ()
-  (run-git "status --short --branch")
-  )
+  (run-git "status --short --branch"))
 
 (defun draw-status ()
   (show-status-info)
   (let (line status file branch-name
              (staged-lines nil)
              (unstaged-lines nil)
-             (untracked-lines nil)
-             )
+             (untracked-lines nil))
     (with-input-from-selected-buffer
       ;; ‚±‚±‚Åƒuƒ‰ƒ“ƒ`–¼Žæ“¾
       (while (null branch-name)
