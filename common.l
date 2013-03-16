@@ -20,7 +20,9 @@
   (define-key *xig-common-map* '#\g #'(lambda () (interactive) (goto-char (point-min))))
   (define-key *xig-common-map* '#\G #'(lambda () (interactive) (goto-char (point-max)) (goto-bol)))
   (define-key *xig-common-map* '#\TAB 'other-window)
+  (define-key *xig-common-map* '#\f 'next-page)
   (define-key *xig-common-map* '#\SPC 'next-page)
+  (define-key *xig-common-map* '#\b 'previous-page)
   )
 
 (defun run-git (command &optional (buffer (selected-buffer)))
