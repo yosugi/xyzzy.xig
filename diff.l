@@ -3,10 +3,11 @@
 ; author yosugi
 
 (provide "xig/diff")
-(in-package "editor")
 
 (require "xig/common")
 (require "xig/xig")
+
+(in-package "xig")
 
 (export '(*xig-diff-window-ratio*))
 

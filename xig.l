@@ -3,11 +3,19 @@
 ; author yosugi
 
 (provide "xig/xig")
-(in-package "editor")
+
+(defpackage "xig"
+ (:use "lisp" "editor"))
 
 (require "xig/common")
 (require "xig/diff")
 (require "xig/status")
+
+(defun xig-mode ()
+  (interactive)
+  (xig::xig-start))
+
+(in-package "xig")
 
 (export '(xig-mode *xig-git-path*))
 
@@ -60,7 +68,7 @@
     (setq commit (match-string 0))
     (xig-diff-commit commit)))
 
-(defun xig-mode ()
+(defun xig-start ()
   (interactive)
   (select-pseudo-frame
    (or (find-pseudo-frame *xig-pframe-name*)

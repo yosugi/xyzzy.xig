@@ -3,9 +3,10 @@
 ; author yosugi
 
 (provide "xig/commit")
-(in-package "editor")
 
 (require "xig/common")
+
+(in-package "xig")
 
 (defvar *xig-commit-message* "# Please enter the commit message for your changes. Lines starting\n# with '#' will be ignored, and an empty message aborts the commit.")
 

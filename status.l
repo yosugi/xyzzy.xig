@@ -3,11 +3,12 @@
 ; author yosugi
 
 (provide "xig/status")
-(in-package "editor")
 
 (require "xig/common")
 (require "xig/commit")
 (require "xig/diff")
+
+(in-package "xig")
 
 (defvar *xig-status-branch-message* "On branch")
 (defvar *xig-status-staged-message* "Changes to be committed:")
