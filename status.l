@@ -7,6 +7,7 @@
 
 (require "xig/common")
 (require "xig/commit")
+(require "xig/diff")
 
 (defvar *xig-status-branch-message* "On branch")
 (defvar *xig-status-staged-message* "Changes to be committed:")
@@ -21,6 +22,7 @@
   (define-key *xig-status-map* '#\! 'xig-status-revert-file)
   (define-key *xig-status-map* '#\C 'xig-edit-commit-message)
   (define-key *xig-status-map* '#\q 'xig-status-quit)
+  (define-key *xig-status-map* '#\RET 'xig-status-diff)
   )
 
 (defun show-status-info ()
@@ -79,13 +81,17 @@
     )
   )
 
-(defun xig-status-handle-area (func)
+(defun xig-status-handle-area (func &optional (allow-nofile nil))
   (let ((line (get-current-line))
         file)
-    (and (< (length line) 3) (return-from xig-status-handle-area))
-    (and (eq (char line 0) #\SPC) (return-from xig-status-handle-area))
-    (or (eq (char line 1) #\SPC) (return-from xig-status-handle-area))
-    (setq file (substring line 4))
+    (when (null allow-nofile)
+      (and (< (length line) 3) (return-from xig-status-handle-area))
+      (and (eq (char line 0) #\SPC) (return-from xig-status-handle-area))
+      (or (eq (char line 1) #\SPC) (return-from xig-status-handle-area))
+      (setq file (substring line 4))
+      )
+    (if (>= (length line) 4)
+        (setq file (substring line 4)))
 
     (let (staged-line-number unstaged-line-number untracked-line-number)
       (save-excursion
@@ -116,19 +122,6 @@
   (setq mode-name "xig-status")
   (use-keymap *xig-status-map*)
   )
-
-;; todo common ‚ÉˆÚ“®
-(defun get-current-line ()
-  (let (from to)
-    (save-excursion
-      (goto-bol)
-      (setq from (point))
-      (goto-eol)
-      (setq to (point))
-      (buffer-substring from to))))
-
-(defun between (x min max)
-  (and (>= x min) (<= x max)))
 
 (defun xig-status-revert-file ()
   (interactive)
@@ -176,3 +169,27 @@
        (delete-buffer (find-buffer "*xig-status*")))
   )
 
+(defun xig-status-diff ()
+  (interactive)
+  (xig-status-handle-area
+   #'(lambda (status file staged-line-number unstaged-line-number untracked-line-number)
+       (cond
+        ((eq (current-line-number) staged-line-number)
+         (xig-diff-all :cached t)
+         )
+        ((eq (current-line-number) unstaged-line-number)
+         (xig-diff-all)
+         )
+        ((>= (current-line-number) untracked-line-number)
+         (message "do nothing")
+         (return-from xig-status-diff)
+         )
+        ((between (current-line-number) staged-line-number unstaged-line-number)
+         (xig-diff-file file :cached t)
+        )
+        ((between (current-line-number) unstaged-line-number untracked-line-number)
+         (xig-diff-file file)
+        )
+       )
+   )
+   t))

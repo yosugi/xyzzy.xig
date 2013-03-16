@@ -24,7 +24,7 @@
   (setq *xig-main-map* (copy-keymap *xig-common-map*))
   (define-key *xig-main-map* '#\R 'xig-show-shortlog)
   (define-key *xig-main-map* '#\g 'xig-toggle-shortlog-graph)
-  (define-key *xig-main-map* '#\RET 'show-diff)
+  (define-key *xig-main-map* '#\RET 'xig-main-diff)
   (define-key *xig-main-map* '#\S 'show-status)
   (define-key *xig-main-map* '#\q 'xig-quit-mode)
   )
@@ -51,6 +51,15 @@
   (save-excursion
     (goto-char (point-max))
     (with-output-to-selected-buffer (format t "~%"))))
+
+(defun xig-main-diff ()
+  (interactive)
+  (let ((line (get-current-line)) commit)
+    (or (string-match "[0-9a-f]+" line)
+        (return-from xig-main-diff))
+    (setq commit (match-string 0))
+    (xig-diff-commit commit)
+    ))
 
 (defun xig-mode ()
   (interactive)

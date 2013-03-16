@@ -35,3 +35,15 @@
    :wait t
    :show :hide))
 
+(defun get-current-line ()
+  (let (from to)
+    (save-excursion
+      (goto-bol)
+      (setq from (point))
+      (goto-eol)
+      (setq to (point))
+      (buffer-substring from to))))
+
+(defun between (x min max)
+  (and (>= x min) (<= x max)))
+
