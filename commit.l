@@ -23,8 +23,8 @@
   (switch-to-buffer "*xig-commit*")
 ;  (delete-other-windows)
   (kill-all-local-variables)
-  (setup-temp-buffer (selected-buffer))
-  (setq kept-undo-information t)
+  (setq need-not-save t)
+  (setq auto-save nil)
   (set-buffer-modified-p nil)
   (draw-commit-message)
   (replace-buffer "^\\([^#].*\n\\)" "## \\1" :regexp t) ; ワーニングが出たら ## の後に表示しとく
