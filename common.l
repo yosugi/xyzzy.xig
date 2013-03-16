@@ -25,19 +25,19 @@
   (define-key *xig-common-map* '#\b 'previous-page)
   )
 
-(defun run-git (command &optional (buffer (selected-buffer)))
+(defun xig-run-git (command &optional (buffer (selected-buffer)))
   (execute-shell-command
    (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
    nil
    buffer))
 
-(defun call-git (command)
+(defun xig-call-git (command)
   (call-process
    (concat (map-slash-to-backslash (get-short-path-name *xig-git-path*)) " " command)
    :wait t
    :show :hide))
 
-(defun get-current-line ()
+(defun xig-get-current-line ()
   (let (from to)
     (save-excursion
       (goto-bol)
@@ -46,6 +46,6 @@
       (setq to (point))
       (buffer-substring from to))))
 
-(defun between (x min max)
+(defun xig-between (x min max)
   (and (>= x min) (<= x max)))
 

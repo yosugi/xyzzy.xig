@@ -12,21 +12,17 @@
 (defvar *xig-commit-map* nil)
 (unless *xig-commit-map*
   (setq *xig-commit-map* (make-keymap))
-  (define-key *xig-commit-map* '(#\C-c #\C-c) 'xig-do-commit)
-  (define-key *xig-commit-map* '#\C-g 'xig-cancel-commit))
+  (define-key *xig-commit-map* '(#\C-c #\C-c) 'xig-commit-execute)
+  (define-key *xig-commit-map* '#\C-g 'xig-commit-cancel))
 
-(defun draw-commit-message ()
-  (run-git "commit --dry-run"))
-
-(defun xig-edit-commit-message ()
+(defun xig-commit-edit-message ()
   (interactive)
   (switch-to-buffer "*xig-commit*")
-;  (delete-other-windows)
   (kill-all-local-variables)
   (setq need-not-save t)
   (setq auto-save nil)
   (set-buffer-modified-p nil)
-  (draw-commit-message)
+  (xig-run-git "commit --dry-run")
   (replace-buffer "^\\([^#].*\n\\)" "## \\1" :regexp t) ; ワーニングが出たら ## の後に表示しとく
   (goto-char (point-min))
   (save-excursion
@@ -37,7 +33,7 @@
   (use-keymap *xig-commit-map*)
   )
 
-(defun xig-do-commit ()
+(defun xig-commit-execute ()
   (interactive)
   (let ((tempfile (make-temp-file-name)))
     (save-excursion
@@ -47,12 +43,12 @@
                     nil
                     *encoding-utf8n*))
     (unwind-protect
-        (run-git (format nil "commit -F ~A" tempfile))
+        (xig-run-git (format nil "commit -F ~A" tempfile))
       (delete-file tempfile))
     (read-string "Press Enter to continue: ")
-    (show-status)))
+    (xig-status-show)))
 
-(defun xig-cancel-commit ()
+(defun xig-commit-cancel ()
   (interactive)
   (when (yes-or-no-p "cancel commit?")
     (switch-to-buffer "*xig-status*")

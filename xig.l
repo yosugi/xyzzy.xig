@@ -25,13 +25,13 @@
   (define-key *xig-main-map* '#\R 'xig-show-shortlog)
   (define-key *xig-main-map* '#\g 'xig-toggle-shortlog-graph)
   (define-key *xig-main-map* '#\RET 'xig-main-diff)
-  (define-key *xig-main-map* '#\S 'show-status)
+  (define-key *xig-main-map* '#\S 'xig-status-show)
   (define-key *xig-main-map* '#\q 'xig-quit-mode)
   )
 
 (defun xig-show-version ()
   (interactive)
-  (run-git "--version"))
+  (xig-run-git "--version"))
 
 (defun xig-show-shortlog ()
   (interactive)
@@ -43,10 +43,10 @@
   (setq buffer-read-only nil)
   (cond
    ((null *xig-shortlog-has-graph*)
-    (run-git *xig-git-shortlog-graph-command*)
+    (xig-run-git *xig-git-shortlog-graph-command*)
     (setq *xig-shortlog-has-graph* t))
    (t
-    (run-git *xig-git-shortlog-command*)
+    (xig-run-git *xig-git-shortlog-command*)
     (setq *xig-shortlog-has-graph* nil)))
   (save-excursion
     (goto-char (point-max))
@@ -54,12 +54,11 @@
 
 (defun xig-main-diff ()
   (interactive)
-  (let ((line (get-current-line)) commit)
+  (let ((line (xig-get-current-line)) commit)
     (or (string-match "[0-9a-f]+" line)
         (return-from xig-main-diff))
     (setq commit (match-string 0))
-    (xig-diff-commit commit)
-    ))
+    (xig-diff-commit commit)))
 
 (defun xig-mode ()
   (interactive)

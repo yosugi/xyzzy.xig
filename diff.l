@@ -18,9 +18,6 @@
   (define-key *xig-diff-map* '#\q 'xig-diff-quit)
   )
 
-(defun show-diff-info (commit)
-  (run-git (format nil "log --stat -p --pretty=fuller -n 1 ~A" commit)))
-
 (defun xig-diff-commit (commit)
   (interactive)
   (xig-diff-show (format nil "log --stat -p --pretty=fuller -n 1 ~A" commit))
@@ -44,7 +41,7 @@
                  nil)
   (kill-all-local-variables)
   (setq buffer-read-only nil)
-  (run-git cmd)
+  (xig-run-git cmd)
   (setq buffer-read-only t)
   (setq mode-name "xig-diff")
   (use-keymap *xig-diff-map*))
