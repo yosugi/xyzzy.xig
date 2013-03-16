@@ -1,6 +1,6 @@
 ; xig-mode
 ; xyzzy interface for git
-; written by yosugi
+; author yosugi
 
 (provide "xig/diff")
 (in-package "editor")
