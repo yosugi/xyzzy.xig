@@ -15,7 +15,7 @@
 (defvar *xig-diff-map* nil)
 (unless *xig-diff-map*
   (setq *xig-diff-map* (copy-keymap *xig-common-map*))
-  (define-key *xig-diff-map* '#\q 'xig-quit-diff)
+  (define-key *xig-diff-map* '#\q 'xig-diff-quit)
   )
 
 (defun show-diff-info (commit)
@@ -45,7 +45,7 @@
     )
   )
 
-(defun xig-quit-diff ()
+(defun xig-diff-quit ()
   (interactive)
   (switch-to-buffer "*xig-main*")
   (delete-other-windows)
