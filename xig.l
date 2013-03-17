@@ -5,11 +5,12 @@
 (provide "xig/xig")
 
 (defpackage "xig"
- (:use "lisp" "editor"))
+  (:use "lisp" "editor"))
 
 (require "xig/common")
 (require "xig/diff")
 (require "xig/status")
+(require "xig/commit")
 
 (defun xig-mode ()
   (interactive)
@@ -19,10 +20,13 @@
 
 (export '(xig-mode *xig-git-path*))
 
-(defvar *xig-mode-name* "xig" "このモードの名前")
-(defvar *xig-pframe-name* *xig-mode-name* "フレームの名前")
+(defconstant *xig-mode-version* "0.1.0" "バージョン")
+(defconstant *xig-mode-name* "xig" "このモードの名前")
+(defconstant *xig-pframe-name* *xig-mode-name* "フレームの名前")
+(defconstant *xig-main-buffer-name* "*xig-main*" "main バッファ名")
 
 (defvar *xig-git-path* "git" "git のパス")
+
 (defvar *xig-shortlog-has-graph* nil "shortlog にグラフを表示しているか")
 (defvar *xig-git-shortlog-command* "log --pretty=format:\"%h %ci %an %d %s\"" "shortlog を表示する時のコマンド")
 (defvar *xig-git-shortlog-graph-command* (concat *xig-git-shortlog-command* " " "--graph"))
@@ -73,7 +77,7 @@
   (select-pseudo-frame
    (or (find-pseudo-frame *xig-pframe-name*)
        (new-pseudo-frame *xig-pframe-name*)))
-  (switch-to-buffer "*xig-main*")
+  (switch-to-buffer *xig-main-buffer-name*)
   (kill-all-local-variables)
   (setup-temp-buffer (selected-buffer))
   (set-buffer-modified-p nil)
@@ -87,11 +91,14 @@
 
 (defun xig-quit-mode ()
   (interactive)
-  (when (find-buffer "*xig-diff*")
-    (xig-quit-diff)
+  (when (find-buffer *xig-diff-buffer-name*)
+    (xig-diff-quit)
     (return-from xig-quit-mode))
   (delete-pseudo-frame)
   (mapcar #'(lambda (buffer-name)
               (if (find-buffer buffer-name)
                   (delete-buffer (find-buffer buffer-name))))
-          '("*xig-main*" "*xig-commit*" "*xig-diff*" "*xig-status*")))
+          (list *xig-main-buffer-name*
+                *xig-diff-buffer-name*
+                *xig-status-buffer-name*
+                *xig-commit-buffer-name*)))

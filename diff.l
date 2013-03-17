@@ -11,7 +11,8 @@
 
 (export '(*xig-diff-window-ratio*))
 
-(defvar *xig-diff-window-ratio* 0.70 "diff を開く比率")
+(defconstant *xig-diff-buffer-name* "*xig-diff*" "diff バッファ名")
+(defconstant *xig-diff-window-ratio* 0.70 "diff を開く比率")
 
 (defvar *xig-diff-map* nil)
 (unless *xig-diff-map*
@@ -37,7 +38,7 @@
     (xig-diff-show cmd)))
 
 (defun xig-diff-show (cmd)
-  (pop-to-buffer (get-buffer-create "*xig-diff*")
+  (pop-to-buffer (get-buffer-create *xig-diff-buffer-name*)
                  (truncate (* (screen-height) *xig-diff-window-ratio* -1)) ; -1 は下に分割させるため
                  nil)
   (kill-all-local-variables)
@@ -51,7 +52,7 @@
   (interactive)
   (other-window)
   (delete-other-windows)
-  (and (find-buffer "*xig-diff*")
-       (delete-buffer (find-buffer "*xig-diff*")))
+  (if (find-buffer *xig-diff-buffer-name*)
+      (delete-buffer (find-buffer *xig-diff-buffer-name*)))
   )
 

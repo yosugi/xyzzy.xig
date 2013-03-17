@@ -8,6 +8,8 @@
 
 (in-package "xig")
 
+(defconstant *xig-commit-buffer-name* "*xig-commit*" "commit バッファ名")
+
 (defvar *xig-commit-message* "# Please enter the commit message for your changes. Lines starting\n# with '#' will be ignored, and an empty message aborts the commit.")
 
 (defvar *xig-commit-map* nil)
@@ -18,7 +20,7 @@
 
 (defun xig-commit-edit-message ()
   (interactive)
-  (switch-to-buffer "*xig-commit*")
+  (switch-to-buffer *xig-commit-buffer-name*)
   (kill-all-local-variables)
   (setq need-not-save t)
   (setq auto-save nil)
@@ -52,8 +54,6 @@
 (defun xig-commit-cancel ()
   (interactive)
   (when (yes-or-no-p "cancel commit?")
-    (switch-to-buffer "*xig-status*")
-    (delete-other-windows)
-    (and (find-buffer "*xig-commit*")
-         (delete-buffer (find-buffer "*xig-commit*")))))
+    (if (find-buffer *xig-commit-buffer-name*)
+        (delete-buffer (find-buffer *xig-commit-buffer-name*)))))
 

@@ -10,11 +10,13 @@
 
 (in-package "xig")
 
-(defvar *xig-status-branch-message* "On branch")
-(defvar *xig-status-staged-message* "Changes to be committed:")
-(defvar *xig-status-unstaged-message* "Changed but not updated:")
-(defvar *xig-status-untracked-message* "Untracked files:")
-(defvar *xig-status-nofiles-message* "(no files)")
+(defconstant *xig-status-buffer-name* "*xig-status*" "status バッファ名")
+
+(defconstant *xig-status-branch-message* "On branch")
+(defconstant *xig-status-staged-message* "Changes to be committed:")
+(defconstant *xig-status-unstaged-message* "Changed but not updated:")
+(defconstant *xig-status-untracked-message* "Untracked files:")
+(defconstant *xig-status-nofiles-message* "(no files)")
 
 (defvar *xig-status-map* nil)
 (unless *xig-status-map*
@@ -94,7 +96,7 @@
 
 (defun xig-status-show ()
   (interactive)
-  (switch-to-buffer "*xig-status*")
+  (switch-to-buffer *xig-status-buffer-name*)
   (delete-other-windows)
   (setup-temp-buffer (selected-buffer))
   (kill-all-local-variables)
@@ -144,10 +146,8 @@
 
 (defun xig-status-quit ()
   (interactive)
-  (switch-to-buffer "*xig-main*")
-  (delete-other-windows)
-  (and (find-buffer "*xig-status*")
-       (delete-buffer (find-buffer "*xig-status*"))))
+  (if (find-buffer *xig-status-buffer-name*)
+      (delete-buffer (find-buffer *xig-status-buffer-name*))))
 
 (defun xig-status-diff ()
   (interactive)
