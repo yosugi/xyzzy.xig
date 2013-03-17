@@ -49,7 +49,9 @@
         (xig-run-git (format nil "commit -F ~A" tempfile))
       (delete-file tempfile))
     (read-string "Press Enter to continue: ")
-    (xig-status-show)))
+    (xig-status-show)
+    (if (find-buffer *xig-commit-buffer-name*)
+        (delete-buffer (find-buffer *xig-commit-buffer-name*)))))
 
 (defun xig-commit-cancel ()
   (interactive)
